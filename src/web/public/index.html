@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#be185d">
+  <title>Love Notes</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --pink: #be185d;
+      --pink-light: #f472b6;
+      --pink-bg: #fdf2f8;
+      --rose: #e11d48;
+      --white: #ffffff;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-700: #374151;
+      --gray-900: #111827;
+      --green: #10b981;
+      --amber: #f59e0b;
+      --red: #ef4444;
+      --radius: 16px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.1);
+      --shadow-lg: 0 4px 20px rgba(0,0,0,0.1);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--pink-bg);
+      color: var(--gray-900);
+      min-height: 100vh;
+      padding-bottom: 80px;
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, var(--pink), var(--rose));
+      color: white;
+      padding: 20px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-lg);
+    }
+    .header h1 { font-size: 1.4rem; font-weight: 700; }
+    .header .subtitle { font-size: 0.85rem; opacity: 0.9; margin-top: 2px; }
+    .days-counter {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 0.8rem;
+      margin-top: 8px;
+    }
+
+    /* Cards */
+    .container { max-width: 600px; margin: 0 auto; padding: 16px; }
+
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow);
+    }
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-title .icon { font-size: 1.2rem; }
+
+    /* Thinking of You Button */
+    .think-btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, var(--pink), var(--rose));
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: var(--shadow-lg);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .think-btn:active { transform: scale(0.97); box-shadow: var(--shadow); }
+    .think-btn:disabled { opacity: 0.6; }
+
+    .think-custom {
+      margin-top: 10px;
+      display: flex;
+      gap: 8px;
+    }
+    .think-custom input {
+      flex: 1;
+      padding: 10px 14px;
+      border: 2px solid var(--gray-200);
+      border-radius: 12px;
+      font-size: 0.9rem;
+      outline: none;
+    }
+    .think-custom input:focus { border-color: var(--pink-light); }
+    .think-custom button {
+      padding: 10px 16px;
+      background: var(--pink);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Stats Row */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .stat {
+      text-align: center;
+      padding: 12px 8px;
+      background: var(--gray-50);
+      border-radius: 12px;
+    }
+    .stat-value { font-size: 1.5rem; font-weight: 800; color: var(--pink); }
+    .stat-label { font-size: 0.7rem; color: var(--gray-500); margin-top: 2px; }
+
+    /* DND Toggle */
+    .dnd-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .dnd-info { flex: 1; }
+    .dnd-info p { font-size: 0.85rem; color: var(--gray-500); margin-top: 2px; }
+    .toggle {
+      width: 52px; height: 28px;
+      background: var(--gray-200);
+      border-radius: 14px;
+      position: relative;
+      cursor: pointer;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+    .toggle.active { background: var(--pink); }
+    .toggle::after {
+      content: '';
+      width: 22px; height: 22px;
+      background: white;
+      border-radius: 50%;
+      position: absolute;
+      top: 3px; left: 3px;
+      transition: transform 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .toggle.active::after { transform: translateX(24px); }
+
+    .dnd-hours {
+      display: flex;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .dnd-hours button {
+      padding: 6px 12px;
+      border: 2px solid var(--gray-200);
+      background: white;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    .dnd-hours button.active {
+      border-color: var(--pink);
+      background: var(--pink-bg);
+      color: var(--pink);
+      font-weight: 600;
+    }
+
+    /* Feature Toggles */
+    .feature-list { display: flex; flex-direction: column; gap: 10px; }
+    .feature-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .feature-name { font-size: 0.9rem; font-weight: 500; }
+
+    /* Message List */
+    .msg-list { display: flex; flex-direction: column; gap: 8px; }
+    .msg-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: var(--gray-50);
+      border-radius: 12px;
+      font-size: 0.85rem;
+    }
+    .msg-item .text { flex: 1; }
+    .msg-item .badge {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 8px;
+      background: var(--pink-bg);
+      color: var(--pink);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .msg-item .del-btn {
+      width: 28px; height: 28px;
+      background: none;
+      border: none;
+      color: var(--gray-400);
+      cursor: pointer;
+      font-size: 1.1rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .msg-item .del-btn:hover { background: var(--gray-100); color: var(--red); }
+
+    /* Add Form */
+    .add-form {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .add-form input, .add-form select {
+      padding: 10px 12px;
+      border: 2px solid var(--gray-200);
+      border-radius: 12px;
+      font-size: 0.85rem;
+      outline: none;
+    }
+    .add-form input:focus, .add-form select:focus { border-color: var(--pink-light); }
+    .add-form input { flex: 1; }
+    .add-form button {
+      padding: 10px 16px;
+      background: var(--pink);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    /* History */
+    .history-item {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--gray-100);
+      font-size: 0.85rem;
+    }
+    .history-item:last-child { border-bottom: none; }
+    .history-meta {
+      display: flex;
+      gap: 8px;
+      font-size: 0.75rem;
+      color: var(--gray-500);
+      margin-top: 4px;
+    }
+    .history-meta .type-badge {
+      padding: 1px 6px;
+      border-radius: 6px;
+      background: var(--gray-100);
+      font-weight: 500;
+    }
+
+    /* Tab nav */
+    .tab-nav {
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      margin-bottom: 12px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .tab-nav::-webkit-scrollbar { display: none; }
+    .tab-btn {
+      padding: 8px 14px;
+      border: none;
+      background: var(--gray-100);
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+      color: var(--gray-500);
+    }
+    .tab-btn.active {
+      background: var(--pink);
+      color: white;
+    }
+
+    /* Tab content */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* Status indicator */
+    .status-dot {
+      display: inline-block;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      margin-right: 4px;
+    }
+    .status-dot.on { background: var(--green); }
+    .status-dot.off { background: var(--red); }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--gray-900);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      z-index: 200;
+      transition: transform 0.3s;
+      box-shadow: var(--shadow-lg);
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* Loading spinner */
+    .spinner {
+      display: inline-block;
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Section headers in content tab */
+    .section-note {
+      font-size: 0.8rem;
+      color: var(--gray-500);
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Auto Love Notes</h1>
+  <div class="subtitle" id="status-line">Loading...</div>
+  <div class="days-counter" id="days-counter" style="display:none"></div>
+</div>
+
+<div class="container">
+
+  <!-- Thinking of You -->
+  <div class="card">
+    <button class="think-btn" id="think-btn" onclick="sendThinkingOfYou()">
+      💭 Thinking of You
+    </button>
+    <div class="think-custom">
+      <input type="text" id="custom-msg" placeholder="Or type a custom message...">
+      <button onclick="sendCustom()">Send</button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="card">
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-value" id="stat-scheduled">-</div>
+        <div class="stat-label">Scheduled Today</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="stat-sent">-</div>
+        <div class="stat-label">Total Sent</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="stat-messages">-</div>
+        <div class="stat-label">Messages</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DND -->
+  <div class="card">
+    <div class="card-title"><span class="icon">🔕</span> Do Not Disturb</div>
+    <div class="dnd-row">
+      <div class="dnd-info">
+        <strong>Pause sending</strong>
+        <p id="dnd-status">Off</p>
+      </div>
+      <div class="toggle" id="dnd-toggle" onclick="toggleDND()"></div>
+    </div>
+    <div class="dnd-hours" id="dnd-hours" style="display:none">
+      <button onclick="setDND(1)">1h</button>
+      <button onclick="setDND(2)">2h</button>
+      <button onclick="setDND(4)">4h</button>
+      <button onclick="setDND(0)">Until I turn off</button>
+    </div>
+  </div>
+
+  <!-- Tabbed Content -->
+  <div class="card">
+    <div class="tab-nav">
+      <button class="tab-btn active" onclick="switchTab('messages')">Messages</button>
+      <button class="tab-btn" onclick="switchTab('jokes')">Inside Jokes</button>
+      <button class="tab-btn" onclick="switchTab('reasons')">Reasons</button>
+      <button class="tab-btn" onclick="switchTab('compliments')">Compliments</button>
+      <button class="tab-btn" onclick="switchTab('quotes')">Quotes</button>
+      <button class="tab-btn" onclick="switchTab('features')">Features</button>
+    </div>
+
+    <!-- Messages Tab -->
+    <div class="tab-content active" id="tab-messages">
+      <div class="msg-list" id="messages-list"></div>
+      <div class="add-form">
+        <input type="text" id="new-msg-text" placeholder="New love note...">
+        <select id="new-msg-cat">
+          <option value="sweet">sweet</option>
+          <option value="romantic">romantic</option>
+          <option value="flirty">flirty</option>
+          <option value="cute">cute</option>
+          <option value="morning">morning</option>
+        </select>
+        <button onclick="addMessage()">Add</button>
+      </div>
+    </div>
+
+    <!-- Inside Jokes Tab -->
+    <div class="tab-content" id="tab-jokes">
+      <p class="section-note">Inside jokes that only you two get</p>
+      <div class="msg-list" id="jokes-list"></div>
+      <div class="add-form">
+        <input type="text" id="new-joke-text" placeholder="Add an inside joke...">
+        <button onclick="addJoke()">Add</button>
+      </div>
+    </div>
+
+    <!-- Reasons Tab -->
+    <div class="tab-content" id="tab-reasons">
+      <p class="section-note">Reasons I love you — sent as a numbered series</p>
+      <div class="msg-list" id="reasons-list"></div>
+      <div class="add-form">
+        <input type="text" id="new-reason-text" placeholder="the way you...">
+        <button onclick="addReason()">Add</button>
+      </div>
+    </div>
+
+    <!-- Compliments Tab -->
+    <div class="tab-content" id="tab-compliments">
+      <p class="section-note">Compliments paired with a love note</p>
+      <div class="msg-list" id="compliments-list"></div>
+      <div class="add-form">
+        <input type="text" id="new-compliment-text" placeholder="Add a compliment...">
+        <button onclick="addCompliment()">Add</button>
+      </div>
+    </div>
+
+    <!-- Quotes Tab -->
+    <div class="tab-content" id="tab-quotes">
+      <p class="section-note">Romantic quotes from famous people</p>
+      <div class="msg-list" id="quotes-list"></div>
+      <div class="add-form" style="flex-wrap: wrap;">
+        <input type="text" id="new-quote-text" placeholder="Quote text..." style="min-width: 60%;">
+        <input type="text" id="new-quote-author" placeholder="Author" style="width: 100px;">
+        <button onclick="addQuote()">Add</button>
+      </div>
+    </div>
+
+    <!-- Features Tab -->
+    <div class="tab-content" id="tab-features">
+      <div class="feature-list" id="features-list"></div>
+    </div>
+  </div>
+
+  <!-- History -->
+  <div class="card">
+    <div class="card-title"><span class="icon">📬</span> Recent History</div>
+    <div id="history-list"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const PIN = localStorage.getItem('love-notes-pin') || '';
+const headers = { 'Content-Type': 'application/json' };
+if (PIN) headers['X-Pin'] = PIN;
+
+function api(path, opts = {}) {
+  opts.headers = { ...headers, ...opts.headers };
+  return fetch('/api' + path, opts).then(r => {
+    if (r.status === 401) {
+      const pin = prompt('Enter dashboard PIN:');
+      if (pin) {
+        localStorage.setItem('love-notes-pin', pin);
+        headers['X-Pin'] = pin;
+        return api(path, opts);
+      }
+    }
+    return r.json();
+  });
+}
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ── Status ─────────────────────────────
+async function loadStatus() {
+  const s = await api('/status');
+  document.getElementById('stat-scheduled').textContent = s.scheduledCount;
+  document.getElementById('stat-sent').textContent = s.totalSent;
+  document.getElementById('stat-messages').textContent = s.totalMessages;
+
+  const dot = s.messengerConfigured ? '<span class="status-dot on"></span>Connected' : '<span class="status-dot off"></span>Not configured';
+  document.getElementById('status-line').innerHTML = dot;
+
+  if (s.daysTogether !== null) {
+    const counter = document.getElementById('days-counter');
+    counter.textContent = s.daysTogether + ' days together';
+    counter.style.display = 'inline-block';
+  }
+
+  // DND state
+  const toggle = document.getElementById('dnd-toggle');
+  const dndHours = document.getElementById('dnd-hours');
+  if (s.dnd.enabled) {
+    toggle.classList.add('active');
+    dndHours.style.display = 'none';
+    let statusText = 'Active';
+    if (s.dnd.until) statusText += ' until ' + new Date(s.dnd.until).toLocaleTimeString();
+    document.getElementById('dnd-status').textContent = statusText;
+  } else {
+    toggle.classList.remove('active');
+    document.getElementById('dnd-status').textContent = 'Off';
+  }
+
+  // Features
+  renderFeatures(s.features);
+}
+
+// ── Thinking of You ────────────────────
+async function sendThinkingOfYou() {
+  const btn = document.getElementById('think-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Sending...';
+  try {
+    await api('/thinking-of-you', { method: 'POST', body: JSON.stringify({}) });
+    toast('Sent with love! 💕');
+  } catch { toast('Failed to send'); }
+  btn.disabled = false;
+  btn.textContent = '💭 Thinking of You';
+  loadStatus();
+}
+
+async function sendCustom() {
+  const input = document.getElementById('custom-msg');
+  if (!input.value.trim()) return;
+  try {
+    await api('/thinking-of-you', { method: 'POST', body: JSON.stringify({ message: input.value }) });
+    toast('Sent: "' + input.value + '"');
+    input.value = '';
+  } catch { toast('Failed to send'); }
+  loadStatus();
+}
+
+// ── DND ────────────────────────────────
+function toggleDND() {
+  const toggle = document.getElementById('dnd-toggle');
+  const isActive = toggle.classList.contains('active');
+  if (isActive) {
+    api('/dnd', { method: 'POST', body: JSON.stringify({ enabled: false }) }).then(() => { loadStatus(); toast('DND off'); });
+  } else {
+    document.getElementById('dnd-hours').style.display = 'flex';
+  }
+}
+
+function setDND(hours) {
+  api('/dnd', { method: 'POST', body: JSON.stringify({ enabled: true, hours: hours || null }) })
+    .then(() => { loadStatus(); toast(hours ? `DND for ${hours}h` : 'DND on'); });
+  document.getElementById('dnd-hours').style.display = 'none';
+}
+
+// ── Tabs ───────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ── Messages ───────────────────────────
+async function loadMessages() {
+  const msgs = await api('/messages');
+  const list = document.getElementById('messages-list');
+  list.innerHTML = msgs.map(m => `
+    <div class="msg-item">
+      <div class="text">${esc(m.text)}</div>
+      <span class="badge">${m.category}</span>
+      <button class="del-btn" onclick="delMessage(${m.id})">&times;</button>
+    </div>
+  `).join('');
+}
+
+async function addMessage() {
+  const text = document.getElementById('new-msg-text').value.trim();
+  if (!text) return;
+  const cat = document.getElementById('new-msg-cat').value;
+  await api('/messages', { method: 'POST', body: JSON.stringify({ text, category: cat }) });
+  document.getElementById('new-msg-text').value = '';
+  toast('Message added!');
+  loadMessages();
+  loadStatus();
+}
+
+async function delMessage(id) {
+  await api('/messages/' + id, { method: 'DELETE' });
+  toast('Removed');
+  loadMessages();
+  loadStatus();
+}
+
+// ── Inside Jokes ───────────────────────
+async function loadJokes() {
+  const jokes = await api('/inside-jokes');
+  const list = document.getElementById('jokes-list');
+  list.innerHTML = jokes.length === 0
+    ? '<p class="section-note">No inside jokes yet — add your first one!</p>'
+    : jokes.map((j, i) => `
+      <div class="msg-item">
+        <div class="text">${esc(j.text)}</div>
+        <button class="del-btn" onclick="delJoke(${i})">&times;</button>
+      </div>
+    `).join('');
+}
+
+async function addJoke() {
+  const text = document.getElementById('new-joke-text').value.trim();
+  if (!text) return;
+  await api('/inside-jokes', { method: 'POST', body: JSON.stringify({ text }) });
+  document.getElementById('new-joke-text').value = '';
+  toast('Inside joke added!');
+  loadJokes();
+}
+
+async function delJoke(idx) {
+  await api('/inside-jokes/' + idx, { method: 'DELETE' });
+  loadJokes();
+}
+
+// ── Reasons ────────────────────────────
+async function loadReasons() {
+  const data = await api('/reasons');
+  const list = document.getElementById('reasons-list');
+  list.innerHTML = data.reasons.map((r, i) => `
+    <div class="msg-item">
+      <div class="text"><strong>#${i + 1}:</strong> ${esc(r)}</div>
+    </div>
+  `).join('');
+}
+
+async function addReason() {
+  const text = document.getElementById('new-reason-text').value.trim();
+  if (!text) return;
+  await api('/reasons', { method: 'POST', body: JSON.stringify({ text }) });
+  document.getElementById('new-reason-text').value = '';
+  toast('Reason added!');
+  loadReasons();
+}
+
+// ── Compliments ────────────────────────
+async function loadCompliments() {
+  const data = await api('/compliments');
+  const list = document.getElementById('compliments-list');
+  list.innerHTML = data.map((c, i) => `
+    <div class="msg-item">
+      <div class="text">${esc(c)}</div>
+    </div>
+  `).join('');
+}
+
+async function addCompliment() {
+  const text = document.getElementById('new-compliment-text').value.trim();
+  if (!text) return;
+  await api('/compliments', { method: 'POST', body: JSON.stringify({ text }) });
+  document.getElementById('new-compliment-text').value = '';
+  toast('Compliment added!');
+  loadCompliments();
+}
+
+// ── Quotes ─────────────────────────────
+async function loadQuotes() {
+  const data = await api('/quotes');
+  const list = document.getElementById('quotes-list');
+  list.innerHTML = data.map(q => `
+    <div class="msg-item">
+      <div class="text">"${esc(q.text)}" — <em>${esc(q.author)}</em></div>
+    </div>
+  `).join('');
+}
+
+async function addQuote() {
+  const text = document.getElementById('new-quote-text').value.trim();
+  const author = document.getElementById('new-quote-author').value.trim();
+  if (!text) return;
+  await api('/quotes', { method: 'POST', body: JSON.stringify({ text, author }) });
+  document.getElementById('new-quote-text').value = '';
+  document.getElementById('new-quote-author').value = '';
+  toast('Quote added!');
+  loadQuotes();
+}
+
+// ── Features ───────────────────────────
+function renderFeatures(features) {
+  const names = {
+    aiGenerated: 'AI-Generated Messages',
+    weatherAware: 'Weather-Aware Notes',
+    photoNotes: 'Photo Attachments',
+    quotes: 'Romantic Quotes',
+    reasons: '"Reasons I Love You" Series',
+    compliments: 'Daily Compliment Combos',
+    insideJokes: 'Inside Jokes',
+  };
+  const list = document.getElementById('features-list');
+  list.innerHTML = Object.entries(features).map(([key, val]) => `
+    <div class="feature-row">
+      <span class="feature-name">${names[key] || key}</span>
+      <div class="toggle ${val ? 'active' : ''}" onclick="toggleFeature('${key}', ${!val})"></div>
+    </div>
+  `).join('');
+}
+
+async function toggleFeature(key, val) {
+  await api('/features', { method: 'POST', body: JSON.stringify({ [key]: val }) });
+  toast(val ? 'Enabled' : 'Disabled');
+  loadStatus();
+}
+
+// ── History ────────────────────────────
+async function loadHistory() {
+  const history = await api('/history?count=20');
+  const list = document.getElementById('history-list');
+  if (history.length === 0) {
+    list.innerHTML = '<p class="section-note">No messages sent yet</p>';
+    return;
+  }
+  list.innerHTML = history.map(h => `
+    <div class="history-item">
+      <div>"${esc(h.message)}"</div>
+      <div class="history-meta">
+        <span>${new Date(h.sentAt).toLocaleString()}</span>
+        <span class="type-badge">${h.type || h.channel || 'message'}</span>
+        ${h.error ? '<span style="color:var(--red)">Failed</span>' : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── Helpers ────────────────────────────
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+// ── Init ───────────────────────────────
+loadStatus();
+loadMessages();
+loadJokes();
+loadReasons();
+loadCompliments();
+loadQuotes();
+loadHistory();
+
+// Auto-refresh status every 30s
+setInterval(loadStatus, 30000);
+</script>
+</body>
+</html>

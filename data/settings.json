@@ -1,0 +1,23 @@
+{
+  "dnd": {
+    "enabled": false,
+    "until": null
+  },
+  "features": {
+    "aiGenerated": true,
+    "weatherAware": true,
+    "photoNotes": true,
+    "quotes": true,
+    "reasons": true,
+    "compliments": true,
+    "insideJokes": true
+  },
+  "weights": {
+    "custom": 40,
+    "aiGenerated": 20,
+    "quote": 10,
+    "reason": 10,
+    "compliment": 10,
+    "insideJoke": 10
+  }
+}

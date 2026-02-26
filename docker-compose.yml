@@ -1,0 +1,13 @@
+services:
+  love-notes:
+    build: .
+    container_name: auto-love-notes
+    restart: unless-stopped
+    ports:
+      - "${DASHBOARD_PORT:-3000}:3000"
+    env_file:
+      - .env
+    volumes:
+      # Persist data and photos across restarts
+      - ./data:/app/data
+      - ./photos:/app/photos
