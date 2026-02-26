@@ -1,0 +1,36 @@
+{
+  "expo": {
+    "name": "Love Notes",
+    "slug": "love-notes",
+    "version": "2.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#fdf2f8"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.lovenotes.app"
+    },
+    "android": {
+      "package": "com.lovenotes.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#be185d"
+      },
+      "permissions": ["NOTIFICATIONS", "VIBRATE"]
+    },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "color": "#be185d"
+        }
+      ]
+    ]
+  }
+}

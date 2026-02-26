@@ -4,7 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#be185d">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+  <link rel="apple-touch-icon" href="/icon-192.png">
   <title>Love Notes</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -790,6 +794,41 @@ loadHistory();
 
 // Auto-refresh status every 30s
 setInterval(loadStatus, 30000);
+
+// ── PWA Service Worker ────────────────
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').then(() => {
+    console.log('[PWA] Service worker registered');
+  });
+}
+
+// ── PWA Install Prompt ────────────────
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // Show install banner
+  const banner = document.createElement('div');
+  banner.id = 'install-banner';
+  banner.innerHTML = '<span>Install Love Notes app?</span><button onclick="installPWA()">Install</button><button onclick="this.parentElement.remove()" style="background:transparent;color:var(--gray-500);">Later</button>';
+  banner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:var(--pink);color:white;padding:12px 16px;display:flex;align-items:center;gap:10px;z-index:300;font-size:0.9rem;';
+  banner.querySelector('button').style.cssText = 'padding:6px 16px;background:white;color:var(--pink);border:none;border-radius:8px;font-weight:700;cursor:pointer;';
+  document.body.prepend(banner);
+});
+
+function installPWA() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+  const banner = document.getElementById('install-banner');
+  if (banner) banner.remove();
+}
+
+// Handle ?action=think shortcut (from PWA shortcut)
+if (new URLSearchParams(location.search).get('action') === 'think') {
+  sendThinkingOfYou();
+  history.replaceState(null, '', '/');
+}
 </script>
 </body>
 </html>

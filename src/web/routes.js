@@ -216,4 +216,18 @@ router.post('/photos', (req, res) => {
   });
 });
 
+// ── Push Token Registration (Expo) ───────────────────────────────────
+router.post('/push-token', (req, res) => {
+  const { token } = req.body;
+  if (!token) return res.status(400).json({ error: 'Token required' });
+
+  const settings = loadSettings();
+  if (!settings.pushTokens) settings.pushTokens = [];
+  if (!settings.pushTokens.includes(token)) {
+    settings.pushTokens.push(token);
+    saveSettings(settings);
+  }
+  res.json({ success: true });
+});
+
 module.exports = router;

@@ -89,9 +89,11 @@ DASHBOARD_PORT=3000
 DASHBOARD_PIN=1234     # Optional PIN protection
 ```
 
-## Mobile Dashboard
+## Mobile Dashboard (PWA)
 
-The web dashboard is fully mobile-friendly. Access it at `http://your-server:3000`.
+The web dashboard is a full **Progressive Web App** — installable on Android and iOS directly from the browser. Access it at `http://your-server:3000`.
+
+On Android: Open in Chrome > tap "Install" or "Add to Home Screen". It will look and feel like a native app with an icon, splash screen, and offline support.
 
 From the dashboard you can:
 - **Send "Thinking of You"** — One tap to send a love note right now
@@ -100,6 +102,34 @@ From the dashboard you can:
 - **Toggle features** — Enable/disable AI, weather, photos, etc.
 - **View history** — See what was sent and when
 - **See stats** — Messages scheduled today, total sent, days together
+
+## Android App (Native)
+
+A full native Android app built with Expo (React Native). Lives in the `mobile/` directory.
+
+### Setup
+
+```bash
+cd mobile
+npm install
+
+# Run in development (requires Expo Go on your phone)
+npm start
+# Scan the QR code with Expo Go
+
+# Build an APK you can install directly
+npx eas build --platform android --profile preview
+```
+
+### Features
+- **Home** — "Thinking of You" button, stats, DND toggle, days counter
+- **Content** — Tabbed interface for Messages, Inside Jokes, Reasons, Compliments, Quotes
+- **History** — Full send history with timestamps and message types
+- **Settings** — Server URL config, PIN, feature toggles
+- **Push Notifications** — Get notified when messages are sent
+
+### How it works
+The Android app connects to your server's REST API. In the Settings tab, enter your server URL (e.g., `http://192.168.1.100:3000`) and optional PIN. Everything syncs in real-time.
 
 ## CLI Commands
 
@@ -208,7 +238,18 @@ The `data/` and `photos/` directories are mounted as volumes so everything persi
 │       ├── server.js          # Express server
 │       ├── routes.js          # REST API
 │       └── public/
-│           └── index.html     # Mobile dashboard
+│           ├── index.html     # PWA dashboard
+│           ├── manifest.json  # PWA manifest
+│           └── sw.js          # Service worker
+├── mobile/                # Native Android app (Expo)
+│   ├── App.js             # App entry + navigation
+│   ├── app.json           # Expo config
+│   ├── eas.json           # EAS Build config
+│   └── src/
+│       ├── api.js          # REST API client
+│       ├── theme.js        # Design tokens
+│       ├── screens/        # Home, Content, History, Settings
+│       └── components/     # Card, Toggle, ListItem, AddForm, StatBox
 ├── data/                  # Auto-created JSON data
 └── photos/                # Drop your photos here
 ```
